@@ -15,6 +15,17 @@ app.set('views', path.join(__dirname, '/views'))
 app.set('view engine', 'ejs')
 
 
+// import Routes
+const adminRoute = require('./router/admin')
+const userRoute = require('./router/user')
+const authRoute = require('./router/auth')
+
+// use middleware
+app.use("/user",userRoute)
+app.use('/admin',adminRoute)
+app.use('/auth',authRoute)
+
+
 app.get('/',(req,res)=>{
     res.render('home')
 })
@@ -29,6 +40,9 @@ app.get('/login',(req,res)=>{
 })
 app.get('/register',(req,res)=>{
     res.render('auth/register')
+})
+app.get('/logout',(req,res)=>{
+    res.send('Page on process')
 })
 
 
