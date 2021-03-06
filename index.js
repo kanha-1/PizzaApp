@@ -1,13 +1,42 @@
 const express = require('express')
 const app = express()
 const PORT = process.env.PORT || 8080
+const mongoose = require("mongoose");
 const ejs = require('ejs')
 const path = require('path')
+const session = require('express-session')
+const flash = require('express-flash')
 const expressLayout = require('express-ejs-layouts')
+const MongoDBStore = require('connect-mongodb-session')(session)
 require('dotenv').config()
 require("./db")
 
+app.use(express.json());
+app.use(express.urlencoded({ extended: true }));
 
+// Session store
+let mongoStore = new MongoDBStore({
+    uri: process.env.DB_CONNECTION,
+    collection: 'sessions'
+})
+
+// Session config
+app.use(session({
+    secret: process.env.COOKIE_SECRET,
+    resave: false,
+    store: mongoStore,
+    saveUninitialized: false,
+    cookie: { maxAge: 1000 * 60 * 60 * 24 } // 24 hour
+}))
+
+app.use(flash())
+// session global midddleware
+
+app.use((req, res, next) => {
+	res.locals.session = req.session;
+	res.locals.user = req.user;
+	next();
+});
 // set Template engine
 app.use(expressLayout)
 app.use(express.static('./public'));
@@ -19,33 +48,15 @@ app.set('view engine', 'ejs')
 const adminRoute = require('./router/admin')
 const userRoute = require('./router/user')
 const authRoute = require('./router/auth')
+const home = require('./router/Home')
 
 // use middleware
-app.use("/user",userRoute)
+app.use("/",userRoute)
 app.use('/admin',adminRoute)
-app.use('/auth',authRoute)
+app.use('/',authRoute)
+app.use('/',home)
 
-
-app.get('/',(req,res)=>{
-    res.render('home')
-})
-app.get('/cart',(req,res)=>{
-    res.render('customer/cart')
-})
-app.get('/order',(req,res)=>{
-    res.render('customer/order')
-})
-app.get('/login',(req,res)=>{
-    res.render('auth/login')
-})
-app.get('/register',(req,res)=>{
-    res.render('auth/register')
-})
-app.get('/logout',(req,res)=>{
-    res.send('Page on process')
-})
-
-
+// listening server
 
 app.listen(PORT,()=>{
     console.log("Server started")
