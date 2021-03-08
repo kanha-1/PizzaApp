@@ -1,4 +1,4 @@
-const User = require("../model/user");
+const User = require("../model/User");
 const bcrypt = require("bcrypt");
 const passport = require("passport");
 const _getRedirectUrl = (req) => {
