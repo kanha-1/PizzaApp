@@ -28,8 +28,5 @@
     "socket.io": "^3.1.2",
     "tailwindcss": "^2.0.3"
   },
-  "devDependencies": {
-    "laravel-mix": "^6.0.13",
-    "resolve-url-loader": "^3.1.2"
-  }
+  "devDependencies": {}
 }

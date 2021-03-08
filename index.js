@@ -8,6 +8,8 @@ const session = require('express-session')
 const flash = require('express-flash')
 const expressLayout = require('express-ejs-layouts')
 const MongoDBStore = require('connect-mongodb-session')(session)
+const passport = require("passport");
+const passportInit = require('./config/passport')
 require('dotenv').config()
 require("./db")
 
@@ -30,13 +32,18 @@ app.use(session({
 }))
 
 app.use(flash())
-// session global midddleware
 
+passportInit(passport);
+app.use(passport.initialize());
+app.use(passport.session());
+
+// session global midddleware
 app.use((req, res, next) => {
 	res.locals.session = req.session;
 	res.locals.user = req.user;
 	next();
 });
+
 // set Template engine
 app.use(expressLayout)
 app.use(express.static('./public'));
