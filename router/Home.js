@@ -4,7 +4,7 @@ const homeController = require("../controller/homeCotroller");
 const menu = require("../model/menu");
 
 router.get("/", (req, res) => {
-	res.render("Home");
+	res.render("home");
 });
 router.get("/Menu", homeController().index);
 router.post("/add", (req, res) => {
