@@ -10,7 +10,15 @@ module.exports={
             }
         })
      },
-    OrderStatus:(req, res)=>{
-        res.send('admin orders status')
+    OrderStatus:(req, res) =>{
+        Orders.updateOne({_id: req.body.orderId}, { status: req.body.status }, (err, data)=> {
+            if(err) {
+                return res.redirect('/admin/orders')
+            }
+            // Emit event 
+            const eventEmitter = req.app.get('eventEmitter')
+            eventEmitter.emit('orderUpdated', { id: req.body.orderId, status: req.body.status })
+            return res.redirect('/admin/orders')
+        })
     }
 }

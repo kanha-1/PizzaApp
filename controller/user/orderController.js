@@ -17,6 +17,8 @@ module.exports = {
 		order.save().then(result =>{
 			req.flash("success", "order placed success");
 			delete req.session.cart
+			const eventEmitter = req.app.get('eventEmitter')
+            eventEmitter.emit('orderUpdated', { id: req.body.orderId, status: req.body.status })	
 			return res.redirect("customer/orders");
 		})
 	},
@@ -27,7 +29,12 @@ module.exports = {
 			res.header('Cache-Control', 'no-store')
 		res.render('customer/order',{orders:orders,moment: moment})
 	},
-	orderById: (req, res) => {
-		res.send("customer order by id");
-	},
+	orderById: async (req, res) =>{
+		const order = await Orders.findById(req.params.id)
+		// Authorize user
+		if(req.user._id.toString() === order.customerId.toString()) {
+			return res.render('customer/singleOrder', { order })
+		}
+		return  res.redirect('/')
+	}
 };
