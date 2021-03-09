@@ -3,7 +3,7 @@
     outline: none;
 }
 .body{
-    background-color: #dedede;
+    background-color: #b16a6a;
 }
 .status{
     background-color:rgb(240, 230, 230);
@@ -110,3 +110,32 @@
     font-size: 14px;
     margin-top: 8px;
  }
+ .card{
+     border: 1px solid gray;
+     border-radius: 10px;
+ }
+ .btn{
+     background-color: hotpink;
+     color: white;
+ }
+ button:focus {
+    border: none;
+    outline: none;
+    transition:all .3s ease-in-out;
+}
+ button:focus:hover {
+   background-color: tomato;
+   
+}
+.nlink{
+    font-weight: bold;
+    color: lightslategrey;
+}
+.hero{
+    background: #F8F8F8;
+    width: 100%;
+}
+.cart{
+background: orange;
+border-radius: 60px;
+}

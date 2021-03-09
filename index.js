@@ -69,15 +69,13 @@ app.use('/',authRoute)
 app.use('/',home)
 
 // listening server
-
-
 const server = app.listen(PORT, () => {
 	console.log(`Listening on port ${PORT}`);
 });
+// Soket Io intigration
 const io = require('socket.io')(server);
 io.on("connection", (socket) => {
     socket.on("join", (orderId) => {
-        console.log(orderId)
 		socket.join(orderId);
 	});
 })
