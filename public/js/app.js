@@ -102,17 +102,12 @@ function initAdmin() {
         }).join('')
     }
     socket.on('orderPlaced', (order) => {
-        new Noty({
-            type: 'success',
-            timeout: 1000,
-            text: 'New order!',
-            progressBar: false,
-        }).show();
         orders.unshift(order)
         orderTableBody.innerHTML = ''
         orderTableBody.innerHTML = generateMarkup(orders)
     })
 }
+    
 
     // Change order status
     let statuses = document.querySelectorAll('.status_line')
@@ -146,30 +141,24 @@ function initAdmin() {
     
     updateStatus(order);
 
-    // soket
+// soket
 let socket = io()
-
+initAdmin(socket)
 // Join
 if(order) {
     socket.emit('join', `order_${order._id}`)
 }
+
 let adminAreaPath = window.location.pathname
 if(adminAreaPath.includes('admin')) {
     initAdmin(socket)
     socket.emit('join', 'adminRoom')
 }
 
-
-socket.on('orderUpdated', (data) => {
-    const updatedOrder = { ...order }
-    updatedOrder.updatedAt = moment().format()
+socket.on('orderUpdated',(data)=>{
+    const updatedOrder = {...order}
+    updatedOrder.updatedAt = new Date().toLocaleTimeString()
     updatedOrder.status = data.status
     updateStatus(updatedOrder)
-    // new Noty({
-    //     type: 'success',
-    //     timeout: 1000,
-    //     text: 'Order updated',
-    //     progressBar: false,
-    // }).show();
+    // console.log(data)
 })
-

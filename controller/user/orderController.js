@@ -17,8 +17,9 @@ module.exports = {
 		order.save().then(result =>{
 			req.flash("success", "order placed success");
 			delete req.session.cart
+			// emit event
 			const eventEmitter = req.app.get('eventEmitter')
-            eventEmitter.emit('orderUpdated', { id: req.body.orderId, status: req.body.status })	
+            eventEmitter.emit('orderPlaced',result )	
 			return res.redirect("customer/orders");
 		})
 	},
