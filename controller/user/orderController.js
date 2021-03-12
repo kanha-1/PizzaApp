@@ -2,11 +2,10 @@ const Orders = require("../../model/order");
 const moment = require('moment')
 module.exports = {
 	orders: (req, res) => {
-		const { phone, address } = req.body;
+		const { phone, address} = req.body;
 		if (!phone || !address) {
-			// return res.status(422).json({ message : 'All fields are required' });
-			req.flash("error", "all field are req.");
-			return res.redirect("/");
+			return res.status(422).json({ message : 'All fields are required' });
+			// return res.redirect("/");
 		}
 		const order = new Orders({
 			customerId: req.user._id,
@@ -15,12 +14,13 @@ module.exports = {
 			address,
 		});
 		order.save().then(result =>{
-			req.flash("success", "order placed success");
+			// req.flash("success", "order placed success");
 			delete req.session.cart
 			// emit event
 			const eventEmitter = req.app.get('eventEmitter')
-            eventEmitter.emit('orderPlaced',result )	
-			return res.redirect("customer/orders");
+            eventEmitter.emit('orderPlaced',result )
+			return res.json({success:"order placed success"})	
+			// return res.redirect("customer/orders");
 		})
 	},
 	custOrders: async (req, res) => {

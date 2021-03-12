@@ -8,6 +8,7 @@ router.get('/cart',cartController.allcart)
 router.post('/update-cart',cartController.updateCart)
 
 // orders manage
+
 router.post('/orders',auth,orderCotroller.orders)
 router.get('/customer/orders',auth,orderCotroller.custOrders)
 router.get('/customer/orders/:id',auth,orderCotroller.orderById)

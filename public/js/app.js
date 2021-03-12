@@ -1,82 +1,100 @@
 // import moment from 'moment'
-let addToCart = document.querySelectorAll('.add-to-cart')
-let cartCounter = document.querySelector('#cartCounter')
-
+let addToCart = document.querySelectorAll(".add-to-cart");
+let cartCounter = document.querySelector("#cartCounter");
 function updateCart(pizza) {
-    axios.post('/update-cart', pizza).then(res => {
-        cartCounter.innerText = res.data.totalQty
-        console.log(res)
-    })
+	axios.post("/update-cart", pizza).then((res) => {
+		cartCounter.innerText = res.data.totalQty;
+	});
 }
 addToCart.forEach((btn) => {
-    btn.addEventListener('click', (e) => {
-        let pizza = JSON.parse(btn.dataset.pizza)
-        updateCart(pizza)
-    })
-})
+	btn.addEventListener("click", (e) => {
+		let pizza = JSON.parse(btn.dataset.pizza);
+		updateCart(pizza);
+	});
+});
 
 // Remove alert message after X seconds
-const alertMsg = document.querySelector('#success-alert')
-if(alertMsg) {
-    setTimeout(() => {
-        alertMsg.remove()
-    }, 2000)
+const alertMsg = document.querySelector("#success-alert");
+if (alertMsg) {
+	setTimeout(() => {
+		alertMsg.remove();
+	}, 2000);
 }
 
 // admin function
 function initAdmin() {
-    const orderTableBody = document.querySelector('#orderById')
-    let orders = []
-    let markup
-    
-    axios.get('/admin/orders', {
-        headers: {
-            "X-Requested-With": "XMLHttpRequest"
-        }
-    }).then(res => {
-        orders = res.data
-        console.log(orders)
-        markup = generateMarkup(orders)
-        orderTableBody.innerHTML = markup
-    }).catch(err => {
-        console.log(err)
-    })
+	const orderTableBody = document.querySelector("#orderById");
+	let orders = [];
+	let markup;
 
-    function renderItems(items) {
-        let parsedItems = Object.values(items)
-        return parsedItems.map((menuItem) => {
-            return `
-                <p>${ menuItem.item.name } - ${ menuItem.qty } pcs </p>
-            `
-        }).join('')
-      }
-      function generateMarkup(orders) {
-        return orders.map(order => {
-            return `
+	axios
+		.get("/admin/orders", {
+			headers: {
+				"X-Requested-With": "XMLHttpRequest",
+			},
+		})
+		.then((res) => {
+			orders = res.data;
+			console.log(orders);
+			markup = generateMarkup(orders);
+			orderTableBody.innerHTML = markup;
+		})
+		.catch((err) => {
+			console.log(err);
+		});
+
+	function renderItems(items) {
+		let parsedItems = Object.values(items);
+		return parsedItems
+			.map((menuItem) => {
+				return `
+                <p>${menuItem.item.name} - ${menuItem.qty} pcs </p>
+            `;
+			})
+			.join("");
+	}
+	function generateMarkup(orders) {
+		return orders
+			.map((order) => {
+				return `
                 <tr>
                 <td class="border px-4 py-2 text-green-900">
-                    <p>${ order._id }</p>
-                    <div>${ renderItems(order.items) }</div>
+                    <p>${order._id}</p>
+                    <div>${renderItems(order.items)}</div>
                 </td>
-                <td class="border px-4 py-2">${ order.customerId.name }</td>
-                <td class="border px-4 py-2">${ order.address }</td>
+                <td class="border px-4 py-2">${order.customerId.name}</td>
+                <td class="border px-4 py-2">${order.address}</td>
                 <td class="border px-4 py-2">
                     <div class="inline-block relative w-64">
                         <form action="/admin/order/status" method="POST">
-                            <input type="hidden" name="orderId" value="${ order._id }">
+                            <input type="hidden" name="orderId" value="${
+															order._id
+														}">
                             <select name="status" onchange="this.form.submit()"
                                 class="block appearance-none w-full bg-white border border-gray-400 hover:border-gray-500 px-4 py-2 pr-8 rounded shadow leading-tight focus:outline-none focus:shadow-outline">
                                 <option value="order_placed"
-                                    ${ order.status === 'order_placed' ? 'selected' : '' }>
+                                    ${
+																			order.status === "order_placed"
+																				? "selected"
+																				: ""
+																		}>
                                     Placed</option>
-                                <option value="confirmed" ${ order.status === 'confirmed' ? 'selected' : '' }>
+                                <option value="confirmed" ${
+																	order.status === "confirmed" ? "selected" : ""
+																}>
                                     Confirmed</option>
-                                <option value="prepared" ${ order.status === 'prepared' ? 'selected' : '' }>
+                                <option value="prepared" ${
+																	order.status === "prepared" ? "selected" : ""
+																}>
                                     Prepared</option>
-                                <option value="delivered" ${ order.status === 'delivered' ? 'selected' : '' }>
+                                <option value="delivered" ${
+																	order.status === "delivered" ? "selected" : ""
+																}>
                                     Delivered
                                 </option>
-                                <option value="completed" ${ order.status === 'completed' ? 'selected' : '' }>
+                                <option value="completed" ${
+																	order.status === "completed" ? "selected" : ""
+																}>
                                     Completed
                                 </option>
                             </select>
@@ -92,73 +110,97 @@ function initAdmin() {
                     </div>
                 </td>
                 <td class="border px-4 py-2">
-                    ${ (order.createdAt) }
+                    ${order.createdAt}
                 </td>
                 <td class="border px-4 py-2">
-                    ${ order.paymentStatus ? 'paid' : 'Not paid' }
+                    ${order.paymentStatus ? "paid" : "Not paid"}
                 </td>
             </tr>
-        `
-        }).join('')
-    }
-    socket.on('orderPlaced', (order) => {
-        orders.unshift(order)
-        orderTableBody.innerHTML = ''
-        orderTableBody.innerHTML = generateMarkup(orders)
-    })
+        `;
+			})
+			.join("");
+	}
+	socket.on("orderPlaced", (order) => {
+		orders.unshift(order);
+		orderTableBody.innerHTML = "";
+		orderTableBody.innerHTML = generateMarkup(orders);
+	});
 }
-    
 
-    // Change order status
-    let statuses = document.querySelectorAll('.status_line')
-    let hiddenInput = document.querySelector('#hiddenInput')
-    let order = hiddenInput ? hiddenInput.value : null
-    order = JSON.parse(order)
-    let time = document.createElement('small')
+// Change order status
+let statuses = document.querySelectorAll(".status_line");
+let hiddenInput = document.querySelector("#hiddenInput");
+let order = hiddenInput ? hiddenInput.value : null;
+order = JSON.parse(order);
+let time = document.createElement("small");
 
-    function updateStatus(order) {
-        statuses.forEach((status) => {
-            status.classList.remove('step-completed')
-            status.classList.remove('current')
-        })
-        let stepCompleted = true;
-        statuses.forEach((status) => {
-           let dataProp = status.dataset.status
-           if(stepCompleted) {
-                status.classList.add('step-completed')
-           }
-           if(dataProp === order.status) {
-                stepCompleted = false
-                time.innerText = (order.updatedAt)
-                status.appendChild(time)
-               if(status.nextElementSibling) {
-                status.nextElementSibling.classList.add('current')
-               }
-           }
-        })
-    
-    }
-    
-    updateStatus(order);
+function updateStatus(order) {
+	statuses.forEach((status) => {
+		status.classList.remove("step-completed");
+		status.classList.remove("current");
+	});
+	let stepCompleted = true;
+	statuses.forEach((status) => {
+		let dataProp = status.dataset.status;
+		if (stepCompleted) {
+			status.classList.add("step-completed");
+		}
+		if (dataProp === order.status) {
+			stepCompleted = false;
+			time.innerText = order.updatedAt;
+			status.appendChild(time);
+			if (status.nextElementSibling) {
+				status.nextElementSibling.classList.add("current");
+			}
+		}
+	});
+}
+updateStatus(order);
+// card style
+stripe = null;
+let card = null;
+// Ajax call
+const paymentForm = document.querySelector("#payment-form");
+if (paymentForm) {
+	paymentForm.addEventListener("submit", async (e) => {
+		e.preventDefault();
+		let formData = new FormData(paymentForm);
+		let formObject = {};
+		for (let [key, value] of formData.entries()) {
+			formObject[key] = value;
+		}
+        axios
+		.post("/orders", formObject)
+		.then((res) => {
+			alert("order placed success");
+			setTimeout(() => {
+				window.location.href = "/customer/orders";
+			}, 1000);
+		})
+		.catch((err) => {
+			console.log(err);
+		});
+	});
+}
 
 // soket
-let socket = io()
-initAdmin(socket)
+let socket = io();
+// initAdmin(socket)
 // Join
-if(order) {
-    socket.emit('join', `order_${order._id}`)
+if (order) {
+	socket.emit("join", `order_${order._id}`);
 }
 
-let adminAreaPath = window.location.pathname
-if(adminAreaPath.includes('admin')) {
-    initAdmin(socket)
-    socket.emit('join', 'adminRoom')
+let adminAreaPath = window.location.pathname;
+if (adminAreaPath.includes("admin")) {
+	initAdmin(socket);
+	socket.emit("join", "adminRoom");
 }
 
-socket.on('orderUpdated',(data)=>{
-    const updatedOrder = {...order}
-    updatedOrder.updatedAt = new Date().toLocaleTimeString()
-    updatedOrder.status = data.status
-    updateStatus(updatedOrder)
-    // console.log(data)
-})
+socket.on("orderUpdated", (data) => {
+	const updatedOrder = { ...order };
+	updatedOrder.updatedAt = new Date().toLocaleTimeString();
+	updatedOrder.status = data.status;
+	updateStatus(updatedOrder);
+	// console.log(data)
+});
