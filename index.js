@@ -11,7 +11,7 @@ const passport = require("passport");
 const passportInit = require('./config/passport')
 const Emitter = require("events");
 require('dotenv').config()
-require("./db")
+require("./config/db")
 
 app.use(express.json());
 app.use(express.urlencoded({ extended: true }));
