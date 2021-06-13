@@ -143,7 +143,7 @@ button:focus:hover {
     background-color:rgb(235, 227, 227);
 }
 .cart {
-	background: orange;
+	background: rgb(226, 179, 23);
 	border-radius: 60px;
 }
 .StripeElement {
