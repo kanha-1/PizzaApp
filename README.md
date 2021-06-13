@@ -1,2 +1,2 @@
 # PizzaApp
-# Live Demo - https://quick-pizzaa.herokuapp.com/register
+# Live Demo - https://quick-pizzaa.herokuapp.com
